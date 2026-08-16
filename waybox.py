@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """A small, safe file organizer."""
 from __future__ import annotations
 
@@ -287,7 +287,22 @@ def add_to_path() -> None:
         bin_dir.mkdir(parents=True, exist_ok=True)
         launcher.write_text(f'@python "{script}" %*\n', encoding="utf-8")
         print(f"Created: {launcher}")
-        print("Add this directory to your User Path, then open a new terminal:")
+        try:
+            import winreg
+            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Environment", 0, winreg.KEY_READ | winreg.KEY_WRITE) as key:
+                try:
+                    current = winreg.QueryValueEx(key, "Path")[0]
+                except FileNotFoundError:
+                    current = ""
+                entries = [entry for entry in current.split(os.pathsep) if entry]
+                if str(bin_dir) not in entries:
+                    entries.append(str(bin_dir))
+                    winreg.SetValueEx(key, "Path", 0, winreg.REG_EXPAND_SZ, os.pathsep.join(entries))
+            os.environ["PATH"] = os.pathsep.join(entries)
+            print("Added to your User Path. Open a new terminal to use `waybox`.")
+        except OSError as error:
+            print(f"Could not update User Path: {error}")
+            print(f"Add this directory manually: {bin_dir}")
     else:
         bin_dir = Path.home() / ".local" / "bin"
         launcher = bin_dir / "waybox"
@@ -334,3 +349,4 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
