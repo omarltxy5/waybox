@@ -3,6 +3,11 @@
 `waybox` is a small command-line utility that moves files from one local directory to destinations defined by explicit rules.
 
 It has no GUI, cloud service, account system, database, or third-party runtime dependencies. Requires Python 3.11+.
+## What Waybox does
+
+Waybox watches or scans one directory that you choose. When it finds a file, it checks your explicit rules and moves matching files to their configured destination directories while preserving their names. For example, a PDF placed in a Waybox directory can be moved to `Documents/PDF`, while an image can be moved to `Pictures`.
+
+You can preview planned moves with dry-run mode, run a one-time organization, or use watch mode for continuous polling. The `status` command reports files added, removed, or changed since the previous check, while `undo` safely reverses recent successful moves when it can do so without overwriting anything.
 ## Why use Waybox?
 
 Use Waybox when you want a predictable place to drop files without giving up control over where they go. You define simple rules yourself, preview the result before moving anything, and keep a readable history that can undo recent moves. It is useful for keeping downloads, project folders, scans, media, or shared local drop folders tidy while staying local, transparent, and easy to inspect.
@@ -154,4 +159,5 @@ python -m pytest -q
 ## License
 
 GPL-3.0-or-later. See `LICENSE`.
+
 
