@@ -1,163 +1,223 @@
-﻿# waybox
+# Waybox
 
-`waybox` is a small command-line utility that moves files from one local directory to destinations defined by explicit rules.
+A tiny, local-first file router for your filesystem.
 
-It has no GUI, cloud service, account system, database, or third-party runtime dependencies. Requires Python 3.11+.
-## What Waybox does
+Drop files into one directory. Waybox moves them to destinations you define with explicit rules.
 
-Waybox watches or scans one directory that you choose. When it finds a file, it checks your explicit rules and moves matching files to their configured destination directories while preserving their names. For example, a PDF placed in a Waybox directory can be moved to `Documents/PDF`, while an image can be moved to `Pictures`.
+No AI. No cloud. No database. No account. No guessing.
 
-You can preview planned moves with dry-run mode, run a one-time organization, or use watch mode for continuous polling. The `status` command reports files added, removed, or changed since the previous check, while `undo` safely reverses recent successful moves when it can do so without overwriting anything.
-## Why use Waybox?
+## Why Waybox?
 
-Use Waybox when you want a predictable place to drop files without giving up control over where they go. You define simple rules yourself, preview the result before moving anything, and keep a readable history that can undo recent moves. It is useful for keeping downloads, project folders, scans, media, or shared local drop folders tidy while staying local, transparent, and easy to inspect.
+Your Downloads folder becomes a landfill because apparently every application on your computer believes its files belong there.
 
-Waybox is deliberately small: it does not guess what files mean, upload anything, rename files unexpectedly, overwrite collisions, or run as a background service unless you choose to use watch mode.
+Waybox gives you one controlled drop directory:
 
-## Install
+~/Downloads
+    ↓
+  Waybox
+    ↓
+┌─────────────┬─────────────┬─────────────┐
+│ Documents   │ Images      │ Archives    │
+│ ~/Documents │ ~/Pictures  │ ~/Archives  │
+└─────────────┴─────────────┴─────────────┘
 
-Copy `waybox.py` somewhere convenient and run it with Python:
+Rules are explicit and predictable. If a file doesn't match a rule, Waybox leaves it alone.
 
-```sh
-python waybox.py --help
-```
+## Features
 
-On macOS or Linux, it may be made executable with `chmod +x waybox.py`.
-
-### Add the command to `PATH`
-
-The easiest way to add Waybox to your `PATH` is to run the interactive settings menu, which can automatically create a launcher or setup the path configuration for you:
-
-```sh
-python waybox.py settings
-```
-
-Alternatively, you can configure your `PATH` manually:
-
-**macOS or Linux:** Put `waybox.py` in a personal bin directory and add that directory to your `PATH`. 
-
-```sh
-mkdir -p "\$HOME/.local/bin"
-cp waybox.py "\$HOME/.local/bin/waybox"
-chmod +x "\$HOME/.local/bin/waybox"
-export PATH="HOME/.local/bin:PATH"
-```
-
-Add the `export PATH=...` line to your shell profile to keep it after restarting the terminal.
-
-**Windows:** Create a directory such as `%USERPROFILE%\bin`, copy `waybox.py` there, and add that directory to the User `Path` environment variable in **System Properties â†’ Environment Variables**. Then run it as `python waybox.py`, or create a `waybox.cmd` launcher in that directory:
-
-```bat
-@python "%~dp0waybox.py" %*
-```
-
-After opening a new terminal, `waybox --help` should work.
+- Explicit file-routing rules
+- Interactive setup
+- One-shot organization
+- Detects new, changed, and removed files with snapshots
+- Optional continuous watch mode
+- Dry-run support
+- Move history
+- Conservative undo
+- Never overwrites existing files
+- Never automatically deletes files
+- Local-only
+- Dependency-free at runtime
+- Cross-platform
+- Human-readable TOML configuration
 
 ## Quick start
 
-```sh
-python waybox.py init
-python waybox.py settings
-python waybox.py organize --dry-run
-python waybox.py organize
-python waybox.py status
-python waybox.py undo
-```
+Requires Python 3.11+.
 
-Use `python waybox.py watch` to repeat organization every two seconds. Stop it with `Ctrl+C`.
+Clone the repository:
 
-`init` is an interactive setup wizard. It asks for the directory to process, the categories to organize, and a destination for each category. Supported categories are `documents`, `images`, `video`, `audio`, and `archives`; enter `all` or a comma-separated list. It creates explicit extension rules and an initial snapshot of the directory.
+    git clone https://github.com/omarltxy5/waybox.git
+    cd waybox
 
-Run `python waybox.py settings` for a compact interactive menu that lets you change the watched directory or create a launcher for adding Waybox to `PATH`. Rules and destinations remain in the TOML file so they stay visible and easy to edit.
+Initialize Waybox:
 
-The directory setting checks that the path exists and is a directory. If a path is misspelled, Waybox suggests similarly named directories when it can. It never creates a directory silently from this menu.
+    python waybox.py init
 
-Waybox watches for files inside the configured directory. It does not track files moved out of that directory; removing a file manually therefore does not create a history entry.
+The setup wizard asks where your files live and which types you want Waybox to organize.
+
+You can select individual categories or use:
+
+    all
+
+to enable every supported file type.
+
+Preview what would happen:
+
+    python waybox.py organize --dry-run
+
+Then organize the files:
+
+    python waybox.py organize
+
+## Everyday use
+
+Check what changed since Waybox last checked the directory:
+
+    waybox status
+
+Example:
+
+    Waybox
+    ~/Downloads
+
+    3 new files:
+
+      + invoice.pdf
+      + screenshot.png
+      + archive.zip
+
+Organize matching files:
+
+    waybox organize
+
+Undo the most recent move:
+
+    waybox undo
+
+Undo several moves:
+
+    waybox undo 3
+
+For continuous organization:
+
+    waybox watch
+
+Watch mode is optional. Waybox can detect changes using its local snapshot without running continuously.
 
 ## Configuration
 
-The default configuration is `~/.config/waybox/config.toml`. Select another file with `--config` or the `WAYBOX_CONFIG` environment variable.
+Waybox uses a small TOML configuration file.
 
-```toml
-[waybox]
-directory = "~/Waybox"
+Example:
 
-[[rule]]
-extension = ".pdf"
-destination = "~/Documents/PDF"
+    [waybox]
+    directory = "~/Downloads"
 
-[[rule]]
-pattern = "photo-*"
-destination = "~/Pictures"
-```
+    [[rule]]
+    extension = ".pdf"
+    destination = "~/Documents/PDF"
 
-Rules are checked from top to bottom. The first matching rule is used. `extension` matches case-insensitively; `pattern` uses shell-style wildcards. Every rule needs a `destination`. Both conditions must match when both are present. Original filenames are always preserved.
+    [[rule]]
+    extension = ".png"
+    destination = "~/Pictures"
 
-On Windows, forward slashes avoid TOML backslash escaping:
+    [[rule]]
+    extension = ".zip"
+    destination = "~/Archives"
 
-```toml
-directory = "C:/Users/Example/Waybox"
-destination = "C:/Users/Example/Documents/PDF"
-```
+Rules are evaluated from top to bottom.
 
-Only files directly inside the configured directory are scanned. Unmatched files remain there.
+You can edit the configuration manually after running `waybox init`.
 
-## Commands
+The default configuration location is:
 
-Each command has one focused job:
+    ~/.config/waybox/config.toml
 
-- `waybox init` starts the setup wizard, writes the TOML configuration, and creates the initial snapshot. Existing files are recorded as already known.
-- `waybox settings` changes the watched directory, validates it, suggests close matches for typos, and can create a PATH launcher.
-- `waybox organize` scans once, applies rules in order, moves matching files, skips collisions, and records successful moves.
-- `waybox organize --dry-run` previews those moves without changing files, directories, history, or snapshots.
-- `waybox watch` repeats organization at a regular interval. It is optional; stop it with `Ctrl+C`.
-- `waybox status` compares the directory with `snapshot.json`, reports new, removed, and changed files, then updates the snapshot.
-- `waybox undo [COUNT]` reverses recent successful moves only when doing so cannot overwrite an existing source file.
-
-Examples:
-
-```sh
-waybox init
-waybox settings
-waybox organize --dry-run
-waybox organize
-waybox status
-waybox undo
-```
-- `waybox init` creates an example configuration and will not overwrite one.
-- `waybox organize` processes the directory once.
-- `waybox organize --dry-run` previews moves without creating directories, moving files, or writing history.
-- `waybox watch` repeats organization at a regular interval; use `--interval SECONDS` to change it.
-- `waybox status` compares the directory with the previous snapshot and reports new, removed, and changed files. It does not move anything.
-- `waybox undo [COUNT]` reverses recent successful moves, one by default.
-
-Watch mode can be stopped cleanly with `Ctrl+C`.
+You can override the configuration location with the `WAYBOX_CONFIG` environment variable.
 
 ## Safety
 
-- Existing destination files are never overwritten.
-- Files are never automatically deleted.
-- Failed moves are not added to history.
-- History is flushed to disk after each successful move.
-- Undo never overwrites a file that already exists at the original source path.
-- Undo skips missing or conflicting files rather than guessing.
+Waybox is deliberately conservative.
 
-History is readable JSON Lines stored beside the configuration by default at `~/.config/waybox/history.jsonl`. Set `state` under `[waybox]` to choose another path. The status snapshot is stored as `snapshot.json` beside the configuration and contains only relative paths, sizes, and modification times.
+It will:
 
-There is a small unavoidable boundary between completing a filesystem move and recording it. If interrupted during that boundary, the file remains safe, but the move may need manual restoration if it is not yet in history.
+- never overwrite an existing destination file
+- never automatically delete files
+- leave unmatched files alone
+- support dry-run before moving anything
+- record successful moves
+- refuse unsafe undo operations
+
+A move is only added to history after the filesystem operation succeeds.
+
+If something looks wrong, use:
+
+    waybox organize --dry-run
+
+before actually moving anything.
+
+## Snapshots
+
+Waybox keeps a small local snapshot of the configured directory.
+
+The snapshot stores file metadata rather than file contents:
+
+- relative path
+- file size
+- modification time
+
+This allows:
+
+    waybox status
+
+to detect what changed since the previous check without requiring Waybox to run continuously.
+
+The snapshot is not a backup and does not contain copies of your files.
+
+## Settings
+
+Run:
+
+    waybox settings
+
+to change the configured directory and manage local Waybox settings.
+
+## Installing as a command
+
+For development, running:
+
+    python waybox.py ...
+
+is enough.
+
+Waybox also includes PATH setup through its settings interface so it can be invoked directly as:
+
+    waybox organize
+
+## Project philosophy
+
+Waybox intentionally does less.
+
+It does not try to classify your files with AI, synchronize them to the cloud, build a database of your filesystem, or replace your file manager.
+
+You define the rules. Waybox follows them.
 
 ## Development
 
-Run the dependency-free checks:
+Run the verification suite:
 
-```sh
-python verify_waybox.py
-python -m py_compile waybox.py verify_waybox.py test_waybox.py
-python -m pytest -q
-```
+    python verify_waybox.py
+
+Run the tests:
+
+    python -m pytest
+
+Check compilation:
+
+    python -m py_compile waybox.py test_waybox.py verify_waybox.py
 
 ## License
 
-GPL-3.0-or-later. See `LICENSE`.
+Waybox is free and open-source software licensed under the GNU General Public License v3.0 or later.
 
-
+See [LICENSE](LICENSE).
