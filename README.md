@@ -1,4 +1,4 @@
-﻿# waybox
+# waybox
 
 `waybox` is a small command-line utility that moves files from one local directory to destinations defined by explicit rules.
 
@@ -16,18 +16,26 @@ On macOS or Linux, it may be made executable with `chmod +x waybox.py`.
 
 ### Add the command to `PATH`
 
-Put `waybox.py` in a personal bin directory and add that directory to your `PATH`. For example, on macOS or Linux:
+The easiest way to add Waybox to your `PATH` is to run the interactive settings menu, which can automatically create a launcher or setup the path configuration for you:
 
 ```sh
-mkdir -p "$HOME/.local/bin"
-cp waybox.py "$HOME/.local/bin/waybox"
-chmod +x "$HOME/.local/bin/waybox"
-export PATH="$HOME/.local/bin:$PATH"
+python waybox.py settings
+```
+
+Alternatively, you can configure your `PATH` manually:
+
+**macOS or Linux:** Put `waybox.py` in a personal bin directory and add that directory to your `PATH`. 
+
+```sh
+mkdir -p "\$HOME/.local/bin"
+cp waybox.py "\$HOME/.local/bin/waybox"
+chmod +x "\$HOME/.local/bin/waybox"
+export PATH="HOME/.local/bin:PATH"
 ```
 
 Add the `export PATH=...` line to your shell profile to keep it after restarting the terminal.
 
-On Windows, create a directory such as `%USERPROFILE%\\bin`, copy `waybox.py` there, and add that directory to the User `Path` environment variable in **System Properties â†’ Environment Variables**. Then run it as `python waybox.py`, or create a `waybox.cmd` launcher in that directory:
+**Windows:** Create a directory such as `%USERPROFILE%\bin`, copy `waybox.py` there, and add that directory to the User `Path` environment variable in **System Properties → Environment Variables**. Then run it as `python waybox.py`, or create a `waybox.cmd` launcher in that directory:
 
 ```bat
 @python "%~dp0waybox.py" %*
@@ -141,6 +149,3 @@ python -m pytest -q
 ## License
 
 GPL-3.0-or-later. See `LICENSE`.
-
-
-
