@@ -1,8 +1,13 @@
-# waybox
+﻿# waybox
 
 `waybox` is a small command-line utility that moves files from one local directory to destinations defined by explicit rules.
 
 It has no GUI, cloud service, account system, database, or third-party runtime dependencies. Requires Python 3.11+.
+## Why use Waybox?
+
+Use Waybox when you want a predictable place to drop files without giving up control over where they go. You define simple rules yourself, preview the result before moving anything, and keep a readable history that can undo recent moves. It is useful for keeping downloads, project folders, scans, media, or shared local drop folders tidy while staying local, transparent, and easy to inspect.
+
+Waybox is deliberately small: it does not guess what files mean, upload anything, rename files unexpectedly, overwrite collisions, or run as a background service unless you choose to use watch mode.
 
 ## Install
 
@@ -35,7 +40,7 @@ export PATH="HOME/.local/bin:PATH"
 
 Add the `export PATH=...` line to your shell profile to keep it after restarting the terminal.
 
-**Windows:** Create a directory such as `%USERPROFILE%\bin`, copy `waybox.py` there, and add that directory to the User `Path` environment variable in **System Properties → Environment Variables**. Then run it as `python waybox.py`, or create a `waybox.cmd` launcher in that directory:
+**Windows:** Create a directory such as `%USERPROFILE%\bin`, copy `waybox.py` there, and add that directory to the User `Path` environment variable in **System Properties â†’ Environment Variables**. Then run it as `python waybox.py`, or create a `waybox.cmd` launcher in that directory:
 
 ```bat
 @python "%~dp0waybox.py" %*
@@ -149,3 +154,4 @@ python -m pytest -q
 ## License
 
 GPL-3.0-or-later. See `LICENSE`.
+
