@@ -12,6 +12,7 @@ Your Downloads folder becomes a landfill because apparently every application on
 
 Waybox gives you one controlled drop directory:
 
+<pre>
 ~/Downloads
     │
     ▼
@@ -20,6 +21,8 @@ Waybox gives you one controlled drop directory:
     ├── Documents  →  ~/Documents
     ├── Images     →  ~/Pictures
     └── Archives   →  ~/Archives
+</pre>
+
 Rules are explicit and predictable. If a file doesn't match a rule, Waybox leaves it alone.
 
 ## Features
